@@ -1,0 +1,2 @@
+rich        # Terminal UI, tables, progress bars
+scapy
