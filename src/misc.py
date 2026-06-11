@@ -1,4 +1,8 @@
 import socket
+import subprocess
+import ipaddress
+import platform
+import re
 
 def get_local_ip() -> str:
     try:
@@ -17,10 +21,27 @@ def derive_subnet(ip: str) -> str:
 
 
 def resolve_hostname(ip: str) -> str:
+    # Try regular DNS first
     try:
         return socket.gethostbyaddr(ip)[0]
     except Exception:
-        return "—"
+        pass
+
+    # Try mDNS (.local) via ping -a on Windows
+    if platform.system() == "Windows":
+        try:
+            result = subprocess.run(
+                ["ping", "-a", "-n", "1", "-w", "500", ip],
+                capture_output=True, text=True
+            )
+            # Output has "Pinging hostname [ip]" on the first line
+            match = re.search(r"Pinging ([^\s\[]+)", result.stdout)
+            if match and match.group(1) != ip:
+                return match.group(1)
+        except Exception:
+            pass
+
+    return "—"
 
 
 def vendor_from_mac(mac: str) -> str:
