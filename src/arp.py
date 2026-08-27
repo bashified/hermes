@@ -32,7 +32,7 @@ def read_arp_cache(subnet: str) -> list[dict]:
     # Linux format:    10.42.0.59 ether 88:a2:9e:4b:52:cb  C  wlan0
     # macOS format:    10.42.0.59 (10.42.0.59) at 88:a2:9e:4b:52:cb on en0
     ip_mac_pattern = re.compile(
-        r'(\d{1,3}(?:\.\d{1,3}){3})\s+.*?([0-9a-fA-F]{2}[:\-][0-9a-fA-F]{2}[:\-][0-9a-fA-F]{2}'
+        r'(\d{1,3}(?:\.\d{1,3}){3})\)?\s+.*?([0-9a-fA-F]{2}[:\-][0-9a-fA-F]{2}[:\-][0-9a-fA-F]{2}'
         r'[:\-][0-9a-fA-F]{2}[:\-][0-9a-fA-F]{2}[:\-][0-9a-fA-F]{2})'
     )
 
