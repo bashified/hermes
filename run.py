@@ -67,11 +67,18 @@ def main():
 
     t0 = time.time()
 
-    console.print("[dim]Step 1/2 — Ping sweep to wake up devices…[/]")
+    console.print("[dim]Step 1/3 — Reading existing ARP cache…[/]")
+    devices = read_arp_cache(target)
+    existing_before = {d["ip"] for d in devices}
+
+    console.print("[dim]Step 2/3 — Ping sweep to wake up devices…[/]")
     ping_sweep(target, args.timeout)
 
-    console.print("[dim]Step 2/2 — Reading ARP cache…[/]\n")
-    devices = read_arp_cache(target)
+    console.print("[dim]Step 3/3 — Reading ARP cache after sweep…[/]\n")
+    devices_after = read_arp_cache(target)
+    for d in devices_after:
+        if d["ip"] not in existing_before:
+            devices.append(d)
 
     if not IS_WINDOWS:
         scapy_devices = scapy_scan(target, args.timeout)
@@ -79,7 +86,8 @@ def main():
         for d in scapy_devices:
             if d["ip"] not in existing_ips:
                 devices.append(d)
-        devices.sort(key=lambda d: ipaddress.IPv4Address(d["ip"]))
+
+    devices.sort(key=lambda d: ipaddress.IPv4Address(d["ip"]))
 
     elapsed = time.time() - t0
     render_results(devices, target, elapsed)

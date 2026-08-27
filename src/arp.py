@@ -85,5 +85,9 @@ def scapy_scan(subnet: str, timeout: int) -> list[dict]:
             })
         devices.sort(key=lambda d: ipaddress.IPv4Address(d["ip"]))
         return devices
-    except Exception:
+    except PermissionError:
+        console.print("[dim yellow]Scapy requires root — skipping raw ARP scan[/]")
+        return []
+    except Exception as e:
+        console.print(f"[dim yellow]Scapy error: {e} — skipping raw ARP scan[/]")
         return []
